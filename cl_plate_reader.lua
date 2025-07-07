@@ -284,9 +284,8 @@ function READER:Main()
 						-- Send the plate information to the NUI side to update the UI
 						SendNUIMessage( { _type = "changePlate", cam = cam, plate = plate, index = index } )
 
-						-- If we use Sonoran CAD, reduce the plate events to just player's vehicle, otherwise life as normal
-						if ( ( CONFIG.use_sonorancad and ( UTIL:IsPlayerInVeh( veh ) or IsVehiclePreviouslyOwnedByPlayer( veh ) ) and GetVehicleClass( veh ) ~= 18 ) or not CONFIG.use_sonorancad ) then
-							-- Trigger the event so developers can hook into the scanner every time a plate is scanned
+						-- Only send scan if a real player is (or was) using the vehicle
+						if ( UTIL:IsPlayerInVeh( veh ) or IsVehiclePreviouslyOwnedByPlayer( veh ) ) and GetVehicleClass( veh ) ~= 18 then
 							TriggerServerEvent( "wk:onPlateScanned", cam, plate, index )
 						end
 					end
