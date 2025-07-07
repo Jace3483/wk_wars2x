@@ -40,6 +40,7 @@ local label =
   ||         \_/\_/|_| \__,_|_|\__|_||_| /_/ \_\_|_\|___/ /___/_/\_\
   || 
   ||                        Created by WolfKnight
+  ||                     Modified by Jace3483 for JCOM
   ||]]
 
 -- Returns the current version set in fxmanifest.lua
