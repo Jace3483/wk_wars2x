@@ -76,3 +76,42 @@ RegisterNetEvent( "wk_wars2x_sync:sendUpdatedOMData" )
 AddEventHandler( "wk_wars2x_sync:sendUpdatedOMData", function( playerFor, data )
 	TriggerClientEvent( "wk_wars2x_sync:receiveUpdatedOMData", playerFor, data )
 end )
+
+
+-- Integration with Bubble.io plate receiving endpoint
+RegisterServerEvent("wk:onPlateScanned")
+AddEventHandler("wk:onPlateScanned", function(cam, plate, index)
+    print("Scanning plate:", plate)
+
+    -- Get steam hex identifier from player source
+    local steamIdentifier = nil
+    for _, id in ipairs(GetPlayerIdentifiers(source)) do
+        if string.sub(id, 1, 6) == "steam:" then
+            steamIdentifier = string.sub(id, 7) -- remove "steam:" prefix
+            break
+        end
+    end
+    if not steamIdentifier then
+        print("[ERROR] Could not find steam identifier for player " .. tostring(source))
+        steamIdentifier = "unknown"
+    end
+
+    PerformHttpRequest("https://jace3483.com/api/1.1/wf/check_plate_bolos", function(err, text, headers)
+		local res = json.decode(text or "{}")
+
+		if res.response and res.response.status == "Found Bolo Match" then
+			print("[BOLO MATCH] Plate: " .. plate)
+			TriggerClientEvent("chat:addMessage", source, {
+				args = { "[BOLO]", "🚨 Exact BOLO match for plate: " .. plate }
+			})
+		end
+	end, "POST", json.encode({
+		plate = plate,
+		index = index,
+		camera = cam,
+		steamhex = steamIdentifier
+	}), {
+		["Content-Type"] = "application/json"
+	})
+
+end)
